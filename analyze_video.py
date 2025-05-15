@@ -6,7 +6,6 @@ model = load_trained_model()
 
 def analyze(file_path):
     try:
-        # Video aç
         cap = cv2.VideoCapture(file_path)
 
         if not cap.isOpened():
@@ -15,9 +14,7 @@ def analyze(file_path):
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         fps = int(cap.get(cv2.CAP_PROP_FPS))
         video_duration = frame_count / fps if fps != 0 else 0
-        frames_analyzed = min(50, frame_count)  # Maksimum 50 frame analiz et
-
-        # Frame toplama
+        frames_analyzed = min(50, frame_count)
         frames = []
         for _ in range(frames_analyzed):
             ret, frame = cap.read()
@@ -29,27 +26,22 @@ def analyze(file_path):
 
         cap.release()
 
-        # Eğer hiç frame alınamadıysa hata döndür
         if len(frames) == 0:
             print("No frames were captured. Check video path or format.")
             return {"error": "No frames could be extracted from the video."}
 
-        # Model için veri hazırlığı
         frames_array = np.array(frames) / 255.0
         print(f"Number of frames for prediction: {len(frames_array)}")
 
-        # Tahmin et
         predictions = model.predict(frames_array)
-        predictions = predictions.flatten()  # Tahminleri düzleştir
+        predictions = predictions.flatten()
         avg_score = np.mean(predictions)
 
-        # JSON uyumlu hale getirmek için float() ile dönüştür
         confidence = float(np.mean(predictions))
         max_confidence = float(np.max(predictions))
         min_confidence = float(np.min(predictions))
         raw_score = float(avg_score)
 
-        # Sınıflandırma
         threshold = 0.5
         label = "Fake" if avg_score >= threshold else "Real"
         consistency = "Very Consistent" if confidence > 0.9 else "Inconsistent"

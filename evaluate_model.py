@@ -2,17 +2,13 @@ import numpy as np
 import tensorflow as tf
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
-# Load data
 X_test = np.load('X_data.npy')
 y_test = np.load('y_data.npy')
 
-# Load model
 model = tf.keras.models.load_model('saved_model')
 
-# Predict
 y_pred = (model.predict(X_test) > 0.5).astype(int)
 
-# Metrics
 accuracy = accuracy_score(y_test, y_pred)
 precision = precision_score(y_test, y_pred)
 recall = recall_score(y_test, y_pred)

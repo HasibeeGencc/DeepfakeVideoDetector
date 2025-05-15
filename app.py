@@ -21,21 +21,16 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    # Save file
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(filepath)
 
-    # Analyze the uploaded video
     analysis_result = analyze(filepath)
 
-    # Konsola yazdır - Debugging için
     print(f"Analysis Result: {analysis_result}")
 
-    # Eğer 'error' varsa hata döndür
     if 'error' in analysis_result:
         return jsonify({"error": analysis_result['error']}), 500
 
-    # Analysis sonucunu kontrol et ve çıktı ver
     if analysis_result['label'] == "Fake":
         print(f"ALERT: Video {file.filename} is classified as FAKE")
     elif analysis_result['label'] == "Real":
