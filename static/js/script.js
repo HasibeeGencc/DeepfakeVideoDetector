@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            displayResults(data.analysis);
+            displayResults(data);
         })
         .catch(error => {
             console.error('Error:', error);

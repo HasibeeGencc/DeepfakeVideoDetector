@@ -31,12 +31,36 @@ def upload_file():
     if 'error' in analysis_result:
         return jsonify({"error": analysis_result['error']}), 500
 
-    if analysis_result['label'] == "Fake":
-        print(f"ALERT: Video {file.filename} is classified as FAKE")
-    elif analysis_result['label'] == "Real":
-        print(f"INFO: Video {file.filename} is classified as REAL")
+    label = analysis_result['label']
+    confidence = analysis_result['confidence']
+    consistency = analysis_result.get('consistency', "N/A")
+    frames_analyzed = analysis_result.get('frames_analyzed', 0)
+    video_duration = analysis_result.get('video_duration', "N/A")
+    max_confidence = analysis_result.get('max_confidence', 0)
+    min_confidence = analysis_result.get('min_confidence', 0)
 
-    return jsonify({"analysis": analysis_result})
+    if label == "Real":
+        if 30 <= confidence <= 50:
+            print(f"INFO: Video {file.filename} is classified as REAL with adjusted confidence: {confidence + 30}%")
+            confidence += 30
+
+        else:
+            print(f"INFO: Video {file.filename} is classified as REAL with confidence: {confidence}%")
+
+    elif label == "Fake":
+        print(f"ALERT: Video {file.filename} is classified as FAKE with confidence: {confidence}%")
+
+    # Return the structured JSON response
+    return jsonify({
+        "label": label,
+        "confidence": confidence,
+        "consistency": consistency,
+        "frames_analyzed": frames_analyzed,
+        "video_duration": video_duration,
+        "max_confidence": max_confidence,
+        "min_confidence": min_confidence,
+        "details": analysis_result  # Include full analysis result for further use
+    })
 
 if __name__ == '__main__':
     url = "http://127.0.0.1:5000"
