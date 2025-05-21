@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from model_loader import load_trained_model
-
+# Load the trained deepfake detection model
 model = load_trained_model()
 
 def analyze(file_path):
@@ -11,6 +11,7 @@ def analyze(file_path):
         if not cap.isOpened():
             return {"error": "Could not open video file."}
 
+        # Get video metadata
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         fps = int(cap.get(cv2.CAP_PROP_FPS))
         video_duration = frame_count / fps if fps != 0 else 0
@@ -27,11 +28,12 @@ def analyze(file_path):
 
         if len(frames) == 0:
             return {"error": "No frames could be extracted from the video."}
-
+        # Preprocess frames
         frames_array = np.array(frames) / 255.0
         predictions = model.predict(frames_array)
         predictions = predictions.flatten()
-        avg_score = np.mean(predictions)
+        avg_score = np.mean(predictions)   # Compute average prediction score
+
 
         confidence = float(np.mean(predictions))
         max_confidence = float(np.max(predictions))

@@ -14,7 +14,7 @@ def load_and_process_images(folder_path, label):
         image = cv2.imread(file_path)
         if image is not None:
             image = cv2.resize(image, IMAGE_SIZE)
-            image = image / 255.0
+            image = image / 255.0  # Normalize pixel values to range [0, 1]
             data.append(image)
             labels.append(label)
     return np.array(data), np.array(labels)
@@ -26,6 +26,7 @@ def create_dataset():
     real_data, real_labels = load_and_process_images(real_path, 1)
     fake_data, fake_labels = load_and_process_images(fake_path, 0)
 
+    # Combine real and fake data
     data = np.concatenate([real_data, fake_data])
     labels = np.concatenate([real_labels, fake_labels])
 
@@ -33,5 +34,5 @@ def create_dataset():
 
 if __name__ == "__main__":
     data, labels = create_dataset()
-    print(f"Data shape: {data.shape}")
-    print(f"Labels shape: {labels.shape}")
+    print(f"Data shape: {data.shape}") # Expected: (num_samples, 128, 128, 3)
+    print(f"Labels shape: {labels.shape}") # Expected: (num_samples,)

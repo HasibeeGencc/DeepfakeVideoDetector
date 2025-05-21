@@ -1,15 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 import os
 import webbrowser
-from analyze_video import analyze
+from analyze_video import analyze # video analysis function
+
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['UPLOAD_FOLDER'] = 'uploads' # store uploads
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')     # Render the HTML upload form
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -21,9 +22,11 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
+    # Save the uploaded file to the uploads folder
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(filepath)
 
+    # Run the analysis on the uploaded video file
     analysis_result = analyze(filepath)
 
     print(f"Analysis Result: {analysis_result}")
@@ -31,6 +34,7 @@ def upload_file():
     if 'error' in analysis_result:
         return jsonify({"error": analysis_result['error']}), 500
 
+    # Extract analysis data
     label = analysis_result['label']
     confidence = analysis_result['confidence']
     consistency = analysis_result.get('consistency', "N/A")
@@ -62,7 +66,7 @@ def upload_file():
         "details": analysis_result  # Include full analysis result for further use
     })
 
-if __name__ == '__main__':
+if __name__ == '__main__':     # Automatically open the web browser to the app
     url = "http://127.0.0.1:5000"
     webbrowser.open(url)
-    app.run(debug=True)
+    app.run(debug=True) # Run Flask
